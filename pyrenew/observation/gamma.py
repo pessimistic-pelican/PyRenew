@@ -78,7 +78,7 @@ class GammaObservation(RandomVariable):
         """
         shape = self.shape_rv.sample()
 
-        # mean = shape / rate -> rate = shape / mean
+        # numpyro uses shape (concentration) and rate parameterisation
         gamma_sample = numpyro.sample(
             name=self.name,
             fn=dist.Gamma(
