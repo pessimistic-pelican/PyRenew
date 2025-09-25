@@ -185,6 +185,7 @@ class HospitalAdmissionsModel(Model):
             *_,
         ) = self.latent_hosp_admissions_rv(
             latent_infections=basic_model.latent_infections,
+            n = n_datapoints,
             **kwargs,
         )
         observed_hosp_admissions = self.hosp_admission_obs_process_rv(

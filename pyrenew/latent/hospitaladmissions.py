@@ -179,6 +179,7 @@ class HospitalAdmissions(RandomVariable):
     def sample(
         self,
         latent_infections: ArrayLike,
+        n: int,
         **kwargs,
     ) -> HospitalAdmissionsSample:
         """
@@ -198,7 +199,7 @@ class HospitalAdmissions(RandomVariable):
         HospitalAdmissionsSample
         """
 
-        infection_hosp_rate = self.infection_hospitalization_ratio_rv(**kwargs)
+        infection_hosp_rate = self.infection_hospitalization_ratio_rv(n = n,**kwargs)
 
         infection_to_admission_interval = self.infection_to_admission_interval_rv(
             **kwargs
@@ -242,7 +243,8 @@ class HospitalAdmissions(RandomVariable):
         )
 
         numpyro.deterministic("latent_hospital_admissions", latent_hospital_admissions)
-
+        numpyro.deterministic("infection_hosp_rate", infection_hosp_rate)
+        
         return HospitalAdmissionsSample(
             infection_hosp_rate=infection_hosp_rate,
             latent_hospital_admissions=latent_hospital_admissions,
