@@ -112,6 +112,7 @@ class Wastewater(RandomVariable):
     def sample(
         self,
         latent_infections: ArrayLike,
+        n: int,
         **kwargs,
     ) -> WastewaterSample:
         """
@@ -131,23 +132,22 @@ class Wastewater(RandomVariable):
         WastewaterSample
         """
 
-        alpha = self.alpha_rv(**kwargs)
+        alpha = self.alpha_rv(n=n,**kwargs)
 
         infection_to_shedding_interval = self.infection_to_shedding_rv(
             **kwargs
         )
 
-        latent_genome_copies_per_person, _ = compute_delay_ascertained_incidence(
+        latent_genome_copies, _ = compute_delay_ascertained_incidence(
             latent_infections,
             infection_to_shedding_interval,
-            p_observed_given_incident = 1
+            p_observed_given_incident = alpha
         )
 
-        latent_genome_copies = latent_genome_copies_per_person * alpha
-
         numpyro.deterministic("latent_genome_copies", latent_genome_copies)
+        numpyro.deterministic("alpha", alpha)
 
         return WastewaterSample(
             alpha=alpha,
-            latent_genome_copies=latent_hospital_admissions,
+            latent_genome_copies=latent_genome_copies,
         )
