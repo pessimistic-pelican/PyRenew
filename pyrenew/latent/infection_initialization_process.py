@@ -64,7 +64,7 @@ class InfectionInitializationProcess(RandomVariable):
             InfectionInitializationMethod,
         )
 
-    def sample(self) -> ArrayLike:
+    def sample(self, **kwargs) -> ArrayLike:
         """Sample the Infection Initialization Process.
 
         Returns

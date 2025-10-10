@@ -129,6 +129,7 @@ class HospitalAdmissionsModel(Model):
         self,
         n_datapoints: int | None = None,
         data_observed_hosp_admissions: ArrayLike | None = None,
+        weekly_obs: bool | None = None,
         padding: int = 0,
         **kwargs,
     ) -> HospModelSample:
@@ -170,7 +171,10 @@ class HospitalAdmissionsModel(Model):
             n_datapoints = len(data_observed_hosp_admissions)
         else:
             n_datapoints = n_datapoints
-
+        
+        if weekly_obs:
+            n_datapoints = n_datapoints * 7
+            
         # Getting the initial quantities from the basic model
         basic_model = self.basic_renewal.sample(
             n_datapoints=n_datapoints,
