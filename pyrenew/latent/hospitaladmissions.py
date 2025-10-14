@@ -77,7 +77,6 @@ class HospitalAdmissions(RandomVariable):
         day_of_week_effect_rv: RandomVariable | None = None,
         hospitalization_reporting_ratio_rv: RandomVariable | None = None,
         obs_data_first_day_of_the_week: int = 0,
-        weeks_map: ArrayLike | None = None,
     ) -> None:
         """
         Default constructor
@@ -100,8 +99,6 @@ class HospitalAdmissions(RandomVariable):
             The day of the week that the first day of the observation data
             corresponds to. Valid values are 0-6, where 0 is Monday and 6 is
             Sunday. Defaults to 0.
-        weeks_map
-            Array that contains the index of the week
 
         Returns
         -------
@@ -123,7 +120,6 @@ class HospitalAdmissions(RandomVariable):
             day_of_week_effect_rv,
             hospitalization_reporting_ratio_rv,
             obs_data_first_day_of_the_week,
-            weeks_map
         )
 
         self.infection_to_admission_interval_rv = infection_to_admission_interval_rv
@@ -131,7 +127,6 @@ class HospitalAdmissions(RandomVariable):
         self.day_of_week_effect_rv = day_of_week_effect_rv
         self.hospitalization_reporting_ratio_rv = hospitalization_reporting_ratio_rv
         self.obs_data_first_day_of_the_week = obs_data_first_day_of_the_week
-        self.weeks_map = weeks_map
 
     @staticmethod
     def validate(
@@ -140,7 +135,6 @@ class HospitalAdmissions(RandomVariable):
         day_of_week_effect_rv: Any,
         hospitalization_reporting_ratio_rv: Any,
         obs_data_first_day_of_the_week: Any,
-        weeks_map: Any,
     ) -> None:
         """
         Validates that the IHR, weekday effects, probability of being
@@ -163,8 +157,6 @@ class HospitalAdmissions(RandomVariable):
             Possibly incorrect input for the day of the week that the first day
             of the observation data corresponds to. Valid values are 0-6, where
             0 is Monday and 6 is Sunday.
-        weeks_map
-            Array of week index, for the aggregation of daily to week data
 
         Returns
         -------
@@ -182,7 +174,6 @@ class HospitalAdmissions(RandomVariable):
         assert isinstance(hospitalization_reporting_ratio_rv, RandomVariable)
         assert isinstance(obs_data_first_day_of_the_week, int)
         assert 0 <= obs_data_first_day_of_the_week <= 6
-        assert isinstance(weeks_map, ArrayLike)
 
         return None
 
@@ -190,6 +181,7 @@ class HospitalAdmissions(RandomVariable):
         self,
         latent_infections: ArrayLike,
         n: int,
+        weekly_obs: bool = None,
         **kwargs,
     ) -> HospitalAdmissionsSample:
         """
@@ -252,9 +244,15 @@ class HospitalAdmissions(RandomVariable):
             * self.hospitalization_reporting_ratio_rv(**kwargs)
         )
 
-        if self.weeks_map is not None:
-            latent_weekly_hospital = jnp.zeros(len(np.unique(self.weeks_map)))
-            latent_hospital_admissions = latent_weekly_hospital.at[self.weeks_map].add(latent_hospital_admissions)
+        if weekly_obs is not None:
+            # Aggregate daily latent hospital admissions into weekly buckets.
+            # n is the number of (daily) timepoints. Expect n to be a multiple of 7
+            # when weekly_obs is requested. Compute number of weeks and reshape
+            # into (n_weeks, 7) then sum across the week axis.
+            n_weeks = n // 7
+            # reshape to (n_weeks, 7) and sum across days to get weekly totals
+            latent_hospital_admissions = latent_hospital_admissions.reshape((n_weeks, 7)).sum(axis=1)
+
 
         numpyro.deterministic("latent_hospital_admissions", latent_hospital_admissions)
         numpyro.deterministic("infection_hosp_rate", infection_hosp_rate)

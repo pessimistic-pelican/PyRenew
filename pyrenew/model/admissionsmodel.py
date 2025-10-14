@@ -172,9 +172,8 @@ class HospitalAdmissionsModel(Model):
         else:
             n_datapoints = n_datapoints
         
-        if weekly_obs:
-            n_datapoints = n_datapoints * 7
-            
+        if weekly_obs is not None:
+            n_datapoints = n_datapoints * 7            
         # Getting the initial quantities from the basic model
         basic_model = self.basic_renewal.sample(
             n_datapoints=n_datapoints,
@@ -190,6 +189,7 @@ class HospitalAdmissionsModel(Model):
         ) = self.latent_hosp_admissions_rv(
             latent_infections=basic_model.latent_infections,
             n = n_datapoints,
+            weekly_obs = weekly_obs,
             **kwargs,
         )
         observed_hosp_admissions = self.hosp_admission_obs_process_rv(

@@ -168,7 +168,7 @@ class InfectionsWithFeedback(RandomVariable):
         )
 
         try:
-            inf_feedback_strength = jnp.broadcast_to(inf_feedback_strength, Rt.shape)
+            inf_feedback_strength = -jnp.abs(jnp.broadcast_to(inf_feedback_strength, Rt.shape))
         except Exception as e:
             raise ValueError(
                 "Could not broadcast inf_feedback_strength "

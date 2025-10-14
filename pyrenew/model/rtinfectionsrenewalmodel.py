@@ -194,12 +194,12 @@ class RtInfectionsRenewalModel(Model):
         I0 = self.I0_rv(**kwargs)
 
         # Sampling from the latent process
-        post_initialization_latent_infections = self.latent_infections_rv(
+        post_initialization_latent_infections,adj_rt = self.latent_infections_rv(
             Rt=Rt,
             gen_int=gen_int,
             I0=I0,
             **kwargs,
-        ).post_initialization_infections
+        )
         observed_infections = self.infection_obs_process_rv(
             mu=post_initialization_latent_infections[padding:],
             obs=data_observed_infections,
@@ -209,10 +209,11 @@ class RtInfectionsRenewalModel(Model):
         all_latent_infections = jnp.hstack([I0, post_initialization_latent_infections])
         numpyro.deterministic("all_latent_infections", all_latent_infections)
 
-        numpyro.deterministic("Rt", Rt)
+        # numpyro.deterministic("Rt", Rt)
+        numpyro.deterministic("Rt", adj_rt)
 
         return RtInfectionsRenewalSample(
-            Rt=Rt,
+            Rt=adj_rt,
             latent_infections=all_latent_infections,
             observed_infections=observed_infections,
         )

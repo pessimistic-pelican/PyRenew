@@ -20,9 +20,12 @@ class InfectionsSample(NamedTuple):
     ----------
     post_initialization_infections:
         The estimated latent infections. Default `None`.
+    Rt:
+        Adjusted reproduction number.
     """
 
     post_initialization_infections: ArrayLike | None = None
+    Rt: ArrayLike | None = None
 
 
 class Infections(RandomVariable):
@@ -105,4 +108,4 @@ class Infections(RandomVariable):
             reversed_generation_interval_pmf=gen_int_rev,
         )
 
-        return InfectionsSample(post_initialization_infections)
+        return InfectionsSample(post_initialization_infections, Rt)
