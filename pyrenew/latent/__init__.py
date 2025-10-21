@@ -2,6 +2,7 @@
 
 from pyrenew.latent.hospitaladmissions import HospitalAdmissions
 from pyrenew.latent.wastewater import Wastewater
+from pyrenew.latent.severeprimary import SeverePrimary
 from pyrenew.latent.infection_functions import (
     compute_infections_from_rt,
     compute_infections_from_rt_with_feedback,
@@ -22,6 +23,7 @@ from pyrenew.latent.infectionswithfeedback import InfectionsWithFeedback
 __all__ = [
     "HospitalAdmissions",
     "Wastewater",
+    "SeverePrimary",
     "Infections",
     "logistic_susceptibility_adjustment",
     "compute_infections_from_rt",
