@@ -192,7 +192,7 @@ class InfectionsWithFeedback(RandomVariable):
             reversed_generation_interval_pmf=gen_int_rev,
             reversed_infection_feedback_pmf=inf_fb_pmf_rev,
         )
-
+        
         return InfectionsRtFeedbackSample(
             post_initialization_infections=post_initialization_infections,
             rt=Rt_adj,

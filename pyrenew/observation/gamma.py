@@ -57,6 +57,7 @@ class GammaObservation(RandomVariable):
     def sample(
         self,
         mu: ArrayLike,
+        pop: int | float = 5.637e6,
         obs: ArrayLike | None = None,
         **kwargs,
     ) -> ArrayLike:
@@ -76,7 +77,7 @@ class GammaObservation(RandomVariable):
         -------
         ArrayLike
         """
-        shape = self.shape_rv.sample()
+        shape = self.shape_rv.sample(pop = pop)
 
         # numpyro uses shape (concentration) and rate parameterisation
         gamma_sample = numpyro.sample(
